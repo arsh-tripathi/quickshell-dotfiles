@@ -18,9 +18,20 @@ PanelWindow {
     ColumnLayout {
         id: list
         anchors.bottom: parent.bottom
+        Network {
+            id: network
+            Network_Menu {
+                id: network_menu
+                anchor.window: bar
+                anchor.rect.x: network.width
+                anchor.rect.y: list.y + bluetooth.y
+            }
+            HoverButtonHandler {
+                menu_id: network_menu
+            }
+        }
         Bluetooth {
             id: bluetooth
-            // onClicked: bluetooth_menu.clickedButton = !bluetooth_menu.clickedButton
             Bluetooth_Menu {
                 id: bluetooth_menu
                 anchor.window: bar
@@ -33,12 +44,14 @@ PanelWindow {
         }
         Logout {
             id: logout
-            onClicked: logout_popup.visible = !logout_popup.visible
             Logout_Menu {
-                id: logout_popup
+                id: logout_menu
                 anchor.window: bar
                 anchor.rect.x: logout.width
                 anchor.rect.y: list.y + logout.y
+            }
+            HoverButtonHandler {
+                menu_id: logout_menu
             }
         }
     }

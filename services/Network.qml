@@ -30,7 +30,10 @@ Singleton {
 
     function connectToNetwork(ssid: string, password: string): void {
         // TODO: Implement password
-        connectProc.exec(["nmcli", "conn", "up", ssid]);
+        if (password == "")
+            connectProc.exec(["nmcli", "conn", "up", ssid]);
+        else
+            connectProc.exec(["nmcli", "conn", "up", ssid, "password", password])
     }
 
     function disconnectFromNetwork(): void {
@@ -182,6 +185,7 @@ Singleton {
         readonly property bool active: lastIpcObject.active
         readonly property string security: lastIpcObject.security
         readonly property bool isSecure: security.length > 0
+        readonly property bool savedPassword: false
     }
 
     Component {

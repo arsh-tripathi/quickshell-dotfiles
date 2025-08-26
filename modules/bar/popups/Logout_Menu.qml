@@ -3,11 +3,11 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../../../widgets/"
 
-PopupWindow {
+PopupMenu {
     id: logout_popup
     implicitHeight: 120
-    visible: false
     Rectangle {
         ColumnLayout {
             Button {

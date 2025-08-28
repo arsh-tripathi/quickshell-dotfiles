@@ -3,8 +3,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell.Bluetooth
-import "../../../widgets"
-import "../../../utils"
+import qs.widgets
+import qs.utils
 
 PopupMenu {
     id: blutetooth_popup

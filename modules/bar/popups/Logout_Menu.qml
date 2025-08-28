@@ -14,7 +14,6 @@ PopupMenu {
                 id: poweroff
                 text: "Power off"
                 onClicked: {
-                    logout_popup.visible = false;
                     poweroff_cmd.running = true;
                 }
             }
@@ -22,7 +21,6 @@ PopupMenu {
                 id: logout
                 text: "Logout"
                 onClicked: {
-                    logout_popup.visible = false;
                     logout_cmd.running = true;
                 }
             }
@@ -30,7 +28,6 @@ PopupMenu {
                 id: lock
                 text: "Lock"
                 onClicked: {
-                    logout_popup.visible = false;
                     lock_cmd.running = true;
                 }
             }
@@ -38,7 +35,6 @@ PopupMenu {
                 id: restart
                 text: "Restart"
                 onClicked: {
-                    logout_popup.visible = false;
                     restart_cmd.running = true;
                 }
             }

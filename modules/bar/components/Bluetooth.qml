@@ -1,6 +1,6 @@
 import QtQuick.Controls
 import Quickshell.Bluetooth
-import "../../../utils"
+import qs.utils
 
 Button {
     id: bluetooth

@@ -1,10 +1,9 @@
 import Quickshell
-import QtQuick
 import QtQuick.Layouts
-import "./components"
-import "./popups"
-import "../../config"
-import "../../widgets"
+import "components"
+import "popups"
+import qs.config
+import qs.widgets
 
 PanelWindow {
     id: bar
@@ -40,6 +39,18 @@ PanelWindow {
             }
             HoverButtonHandler {
                 menu_id: bluetooth_menu
+            }
+        }
+        Power {
+            id: power
+            Power_Menu {
+                id: power_menu
+                anchor.window: bar
+                anchor.rect.x: power.width
+                anchor.rect.y: list.y + power.y
+            }
+            HoverButtonHandler {
+                menu_id: power_menu
             }
         }
         Logout {

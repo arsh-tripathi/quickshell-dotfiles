@@ -10,6 +10,9 @@ Singleton {
     readonly property list<AccessPoint> networks: []
     readonly property AccessPoint active: networks.find(n => n.active) ?? null
     property bool wifiEnabled: true
+    property int exitCode: 0
+    readonly property bool connecting: connectProc.running
+    readonly property bool disconnecting: disconnectProc.running
     readonly property bool scanning: rescanProc.running
 
     reloadableId: "network"
@@ -30,10 +33,16 @@ Singleton {
 
     function connectToNetwork(ssid: string, password: string): void {
         // TODO: Implement password
+        const rNetworks = root.networks;
+        const network = rNetworks.find(obj => obj.ssid == ssid);
+        network.connection_attempts += 1;
         if (password == "")
             connectProc.exec(["nmcli", "conn", "up", ssid]);
-        else
-            connectProc.exec(["nmcli", "conn", "up", ssid, "password", password])
+        else {
+            cleanConnect.ssid = ssid;
+            cleanConnect.pass = password;
+            cleanConnect.running = true;
+        }
     }
 
     function disconnectFromNetwork(): void {
@@ -51,6 +60,16 @@ Singleton {
         command: ["nmcli", "m"]
         stdout: SplitParser {
             onRead: getNetworks.running = true
+        }
+    }
+
+    Process {
+        id: cleanConnect
+        property string ssid
+        property string pass
+        command: ["nmcli", "conn", "delete", ssid]
+        onExited: {
+            connectProc.exec(["nmcli", "dev", "wifi", "connect", ssid, "password", pass])
         }
     }
 
@@ -91,6 +110,7 @@ Singleton {
     Process {
         id: connectProc
 
+        onExited: (exit_code, exit_status) => root.exitCode = exit_code
         stdout: SplitParser {
             onRead: getNetworks.running = true
         }
@@ -185,7 +205,7 @@ Singleton {
         readonly property bool active: lastIpcObject.active
         readonly property string security: lastIpcObject.security
         readonly property bool isSecure: security.length > 0
-        readonly property bool savedPassword: false
+        property int connection_attempts: 0
     }
 
     Component {

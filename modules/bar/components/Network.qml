@@ -1,6 +1,6 @@
 import QtQuick.Controls
-import "../../../services"
-import "../../../utils"
+import qs.services
+import qs.utils
 
 Button {
     id: network

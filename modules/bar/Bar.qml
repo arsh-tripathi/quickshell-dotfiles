@@ -17,6 +17,18 @@ PanelWindow {
     ColumnLayout {
         id: list
         anchors.bottom: parent.bottom
+        Clock {
+            id: clock
+            Clock_Menu {
+                id: clock_menu
+                anchor.window: bar
+                anchor.rect.x: clock.width
+                anchor.rect.y: list.y + clock.y
+            }
+            HoverButtonHandler {
+                menu_id: clock_menu
+            }
+        }
         Network {
             id: network
             Network_Menu {

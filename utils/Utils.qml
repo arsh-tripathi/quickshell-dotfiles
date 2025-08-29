@@ -17,4 +17,12 @@ Singleton {
         else
             return "2.4GHz";
     }
+    function getTimeStr(seconds: real): string {
+        let hours = Math.floor(seconds / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        if (hours === 0)
+            return minutes + "min";
+        else 
+            return hours + "h " + minutes + "min";
+    }
 }

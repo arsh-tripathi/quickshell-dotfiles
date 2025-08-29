@@ -3,7 +3,7 @@ import Quickshell.Io
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../../../widgets/"
+import qs.widgets
 
 PopupMenu {
     id: logout_popup

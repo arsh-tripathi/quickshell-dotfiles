@@ -83,6 +83,7 @@ PopupMenu {
                                 id: password
                                 placeholderText: "Enter password"
                                 echoMode: (show_pass.show) ? TextInput.Normal : TextInput.Password
+                                Keys.onReturnPressed: Network.connectToNetwork(connection.modelData.ssid, password.text);
                             }
                             Button {
                                 id: show_pass

@@ -14,9 +14,32 @@ PanelWindow {
         top: true
         bottom: true
     }
+    Workspaces {
+        id: workspaces
+        anchors.top: parent.top
+    }
+    Tray {
+        id: systemTray
+        parentWindow: bar
+        trayWidth: 30
+        trayYoffset: systemTray.y
+        anchors.centerIn: parent
+    }
     ColumnLayout {
         id: list
         anchors.bottom: parent.bottom
+        Calendar {
+            id: calendar
+            Calendar_Menu {
+                id: calendar_menu
+                anchor.window: bar
+                anchor.rect.x: clock.width
+                anchor.rect.y: list.y + calendar.y
+            }
+            HoverButtonHandler {
+                menu_id: calendar_menu
+            }
+        }
         Clock {
             id: clock
             Clock_Menu {

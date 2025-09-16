@@ -18,15 +18,22 @@ ColumnLayout {
         Button {
             id: item
             required property var modelData
-            visible: modelData.status !== Status.Passive
+            visible: (SystemTray.items.values.length < 5) || modelData.status !== Status.Passive
             implicitHeight: 30
             implicitWidth: 30
-            IconImage {
-                source: item.modelData.icon
-                implicitSize: 30
+            background: Rectangle {
+                color: "black"
             }
-            text: {
-                console.log(modelData.icon)
+            IconImage {
+                source: {
+                    let icon = item.modelData.icon;
+                    if (icon.includes("?path=")) {
+                        const [name, path] = icon.split("?path=");
+                        icon = `file://${path}/${name.slice(name.lastIndexOf("/") + 1)}`;
+                    }
+                    return icon;
+                }
+                implicitSize: 30
             }
             MouseArea {
                 anchors.fill: parent

@@ -1,8 +1,8 @@
 import QtQuick.Controls
 
 Button {
-    id: calendar
-    text: " "
+    id: home
+    text: "A"
     implicitHeight: 30
     implicitWidth: 30
 }

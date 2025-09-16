@@ -1,6 +1,7 @@
+//@ pragma UseQApplication
 import Quickshell
 import QtQuick
-import "modules/bar"
+import qs.modules.bar
 
 ShellRoot {
     Bar {}

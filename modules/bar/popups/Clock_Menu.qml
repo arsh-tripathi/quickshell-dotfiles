@@ -199,7 +199,7 @@ PopupMenu {
                     }
                     Component.onCompleted: {
                         Time.tick.connect(() => {
-                            if (timer.modelData.secondsLeft === 0) timer.modelData.running = false;
+                            if (!timer || timer.modelData.secondsLeft === 0) timer.modelData.running = false;
                             if (timer && timer.modelData.running) timer.modelData.secondsLeft -= 1
                         })
                     }

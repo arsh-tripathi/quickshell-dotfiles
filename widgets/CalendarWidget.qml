@@ -6,6 +6,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import qs.services
 import qs.utils
+import qs.widgets
 
 ColumnLayout {
     id: root
@@ -27,77 +28,124 @@ ColumnLayout {
     function refreshTasks() {
         Tasks.refresh();
     }
-    ColumnLayout {
-        RowLayout {
-            Button {
-                text: " "
-                implicitWidth: 30
-                onClicked: {
-                    if (root.month > 0) root.month -= 1;
-                    else {
-                        root.month = 12;
-                        root.year -= 1;
-                    }
-                    Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
-                                   calendar.selectedDate, root.month, root.year)
-                }
-            }
-            Text {
-                text: Utils.getCalenderHeader(root.month, root.year)
-                Layout.alignment: Qt.AlignHCenter
-            }
-            Button {
-                text: " "
-                implicitWidth: 30
-                onClicked: {
-                    if (root.month < 12) root.month += 1;
-                    else {
-                        root.month = 1;
-                        root.year += 1;
-                    }
-                    Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
-                                   calendar.selectedDate, root.month, root.year)
-                }
-            }
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.preferredWidth: calendar.width
-        }
-        GridLayout {
-            id: calendar
-            columns: 7
-            property int selectedDate: root.date
-            Repeater {
-                model: ["S", "M", "T", "W", "T", "F", "S"]
-                Text {
-                    required property string modelData
-                    text: {
-                        return modelData;
-                    }
-                    Layout.alignment: Qt.AlignCenter
-                }
-            }
-            Repeater {
-                model: Utils.getMonthNumDays(root.month, root.year)
+    RowLayout {
+        ColumnLayout {
+            RowLayout {
                 Button {
-                    id: day
-                    implicitWidth: 25
-                    implicitHeight: 25
-                    required property int index;
-                    text: index + 1
-                    Layout.row: Math.floor((root.startDay + index) / 7) + 1
-                    Layout.column: (root.startDay + index) % 7
-                    background: Rectangle {
-                        color: (day.index + 1 === root.date &&
-                                root.month === parseInt(Time.format("M")) &&
-                                root.year === parseInt(Time.format("yyyy"))) ? "aqua" : 
-                                (calendar.selectedDate === day.index + 1) ? "yellow" :"white"
-                    }
+                    text: " "
+                    implicitWidth: 30
                     onClicked: {
-                        calendar.selectedDate = index + 1;
+                        if (root.month > 0) root.month -= 1;
+                        else {
+                            root.month = 12;
+                            root.year -= 1;
+                        }
                         Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
                                        calendar.selectedDate, root.month, root.year)
                     }
                 }
+                Text {
+                    text: Utils.getCalenderHeader(root.month, root.year)
+                    Layout.alignment: Qt.AlignHCenter
+                }
+                Button {
+                    text: " "
+                    implicitWidth: 30
+                    onClicked: {
+                        if (root.month < 12) root.month += 1;
+                        else {
+                            root.month = 1;
+                            root.year += 1;
+                        }
+                        Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
+                                       calendar.selectedDate, root.month, root.year)
+                    }
+                }
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                Layout.preferredWidth: calendar.width
+            }
+            GridLayout {
+                id: calendar
+                columns: 7
+                property int selectedDate: root.date
+                Repeater {
+                    model: ["S", "M", "T", "W", "T", "F", "S"]
+                    Text {
+                        required property string modelData
+                        text: {
+                            return modelData;
+                        }
+                        Layout.alignment: Qt.AlignCenter
+                    }
+                }
+                Repeater {
+                    model: Utils.getMonthNumDays(root.month, root.year)
+                    Button {
+                        id: day
+                        implicitWidth: 25
+                        implicitHeight: 25
+                        required property int index;
+                        text: index + 1
+                        Layout.row: Math.floor((root.startDay + index) / 7) + 1
+                        Layout.column: (root.startDay + index) % 7
+                        background: Rectangle {
+                            color: (day.index + 1 === root.date &&
+                                    root.month === parseInt(Time.format("M")) &&
+                                    root.year === parseInt(Time.format("yyyy"))) ? "aqua" : 
+                                    (calendar.selectedDate === day.index + 1) ? "yellow" :"white"
+                        }
+                        onClicked: {
+                            calendar.selectedDate = index + 1;
+                            Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
+                                           calendar.selectedDate, root.month, root.year)
+                        }
+                    }
+                }
+            }
+        }
+        ColumnLayout {
+            Button {
+                text: "Create Task"
+                onClicked: {
+                    Tasks.createTask(
+                        newTitle.text, 
+                        newDesc.text, 
+                        hasDueCheck.checkState === Qt.Checked,
+                        datePicker.date,
+                        datePicker.month,
+                        datePicker.year
+                    );
+                    newTitle.text = "";
+                    newDesc.text = "";
+                    hasDueCheck.checkState === Qt.Unchecked
+                    datePicker.date = calendar.selectedDate;
+                    datePicker.date = root.month;
+                    datePicker.year = root.year;
+                }
+            }
+            RowLayout {
+                Text {
+                    text: "Due Date:"
+                }
+                CheckBox {
+                    id: hasDueCheck
+                    checkState: Qt.Unchecked
+                }
+            }
+            DatePickerWidget {
+                id: datePicker
+                visible: hasDueCheck.checkState === Qt.Checked
+                date: calendar.selectedDate
+                month: root.month
+                year: root.year
+            }
+            TextField {
+                id: newTitle
+                placeholderText: "Title"
+            }
+            TextField {
+                id: newDesc
+                placeholderText: "Description"
             }
         }
     }
@@ -124,62 +172,12 @@ ColumnLayout {
                         checkState: task.modelData.completed ? Qt.Checked : Qt.Unchecked
                         onClicked: Tasks.toggleStatus(task.modelData.id)
                     }
-                    SpinBox {
-                        id: dueDate
+                    DatePickerWidget {
+                        id: picker
                         visible: task.editing
-                        editable: true
-                        implicitWidth: 50
-                        from: 0
-                        to: Utils.getMonthNumDays(root.month, root.year)
-                        value: task.modelData.day
-
-                        validator: IntValidator { bottom: 0; top: Utils.getMonthNumDays(root.month, root.year) }
-
-                        textFromValue: function(value) {
-                            return value.toString().padStart(2, "0")
-                        }
-
-                        valueFromText: function(text) {
-                            return parseInt(text)
-                        }
-                    }
-                    SpinBox {
-                        id: dueMonth
-                        visible: task.editing
-                        editable: true
-                        from: 1
-                        to: 12
-                        value: task.modelData.month
-                        implicitWidth: 50
-
-                        validator: IntValidator { bottom: 1; top: 12 }
-
-                        textFromValue: function(value) {
-                            return value.toString().padStart(2, "0")
-                        }
-
-                        valueFromText: function(text) {
-                            return parseInt(text)
-                        }
-                    }
-                    SpinBox {
-                        id: dueYear
-                        visible: task.editing
-                        editable: true
-                        from: 0
-                        to: 2400
-                        value: task.modelData.year
-                        implicitWidth: 50
-
-                        validator: IntValidator { bottom: 0; top: 2400 }
-
-                        textFromValue: function(value) {
-                            return value.toString().padStart(4, "0")
-                        }
-
-                        valueFromText: function(text) {
-                            return parseInt(text)
-                        }
+                        date: task.modelData.day
+                        month: task.modelData.month
+                        year: task.modelData.year
                     }
                     ColumnLayout {
                         Text {
@@ -216,7 +214,13 @@ ColumnLayout {
                                 (title.text != task.modelData.title || 
                                  desc.text  != task.modelData.notes)) {
                                 Tasks.setTitleAndDesc(task.modelData.id, title.text, desc.text);
+                            } else if (
+                                picker.date != task.modelData.day ||
+                                picker.month != task.modelData.month ||
+                                picker.year  != task.modelData.year) {
+                                Tasks.setDueDate(task.modelData.id, picker.date, picker.month, picker.year)
                             }
+
                             task.editing = !task.editing
                         }
                     }
@@ -260,62 +264,12 @@ ColumnLayout {
                         checkState: task2.modelData.completed ? Qt.Checked : Qt.Unchecked
                         onClicked: Tasks.toggleStatus(task2.modelData.id)
                     }
-                    SpinBox {
-                        id: date
+                    DatePickerWidget {
+                        id: picker2
                         visible: task2.editing
-                        editable: true
-                        implicitWidth: 50
-                        from: 0
-                        to: Utils.getMonthNumDays(root.month, root.year)
-                        value: task2.modelData.day
-
-                        validator: IntValidator { bottom: 0; top: Utils.getMonthNumDays(root.month, root.year) }
-
-                        textFromValue: function(value) {
-                            return value.toString().padStart(2, "0")
-                        }
-
-                        valueFromText: function(text) {
-                            return parseInt(text)
-                        }
-                    }
-                    SpinBox {
-                        id: month
-                        visible: task2.editing
-                        editable: true
-                        from: 1
-                        to: 12
-                        value: task2.modelData.month
-                        implicitWidth: 50
-
-                        validator: IntValidator { bottom: 1; top: 12 }
-
-                        textFromValue: function(value) {
-                            return value.toString().padStart(2, "0")
-                        }
-
-                        valueFromText: function(text) {
-                            return parseInt(text)
-                        }
-                    }
-                    SpinBox {
-                        id: year
-                        visible: task2.editing
-                        editable: true
-                        from: 0
-                        to: 2400
-                        value: task2.modelData.year
-                        implicitWidth: 50
-
-                        validator: IntValidator { bottom: 0; top: 2400 }
-
-                        textFromValue: function(value) {
-                            return value.toString().padStart(4, "0")
-                        }
-
-                        valueFromText: function(text) {
-                            return parseInt(text)
-                        }
+                        date: task2.modelData.day
+                        month: task2.modelData.month
+                        year: task2.modelData.year
                     }
                     ColumnLayout {
                         Text {
@@ -353,10 +307,10 @@ ColumnLayout {
                                     desc2.text  != task2.modelData.notes) {
                                     Tasks.setTitleAndDesc(task2.modelData.id, title2.text, desc2.text);
                                 } else if (
-                                    date.value  != task2.modelData.day ||
-                                    month.value != task2.modelData.month ||
-                                    year.value  != task2.modelData.year) {
-                                    Tasks.setDueDate(task2.modelData.id, date.value, month.value, year.value)
+                                    picker2.date!= task2.modelData.day ||
+                                    picker2.month != task2.modelData.month ||
+                                    picker2.year  != task2.modelData.year) {
+                                    Tasks.setDueDate(task2.modelData.id, picker2.date, picker2.month, picker2.year)
                                 }
                             }
                             task2.editing = !task2.editing

@@ -32,16 +32,24 @@ PopupMenu {
             }
         }
         RowLayout {
-            Text {
-                text: " "
+            Button {
+                text: (Utils.muted || Utils.volume === 0) ? " " : " "
+                implicitHeight: 30
+                implicitWidth: 30
+                onClicked: Utils.toggleMute()
             }
             Slider {
                 id: volume
-                from: 1
+                from: 0
                 to: 100
                 value: Utils.volume
                 stepSize: 1.0
-                onMoved: if (pressed) Utils.setVolume(value)
+                onMoved: {
+                    if (pressed) {
+                        if (Utils.muted) Utils.toggleMute()
+                        Utils.setVolume(value)
+                    }
+                }
             }
         }
         CalendarWidget {

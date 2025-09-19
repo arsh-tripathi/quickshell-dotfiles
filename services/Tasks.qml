@@ -62,6 +62,13 @@ Singleton {
         toggleComplete.running = true;
     }
 
+    function createTask(title: string, desc: string, hasDueDate: bool, date: int, month: int, year: int) {
+        createTaskProc.title = title;
+        createTaskProc.notes = desc;
+        createTaskProc.dueDateString = (hasDueDate) ? date + "/" + month + "/" + year: "";
+        createTaskProc.running = true;
+    }
+
     function deleteTask(taskId: string) {
         deleteTaskProc.taskId = taskId
         deleteTaskProc.running = true;
@@ -71,7 +78,7 @@ Singleton {
         setTitle.taskId = taskId;
         setTitle.newTitle = newTitle;
         setTitle.newDesc = newDesc;
-        setTtheitle.running = true;
+        setTitle.running = true;
     }
 
     function setDueDate(taskId: string, day: int, month: int, year: int) {
@@ -95,7 +102,8 @@ Singleton {
         property string newTitle
         property string newDesc
         command: ["gtasks-cli", "update", "--field", "title", "--value", newTitle, "--task", taskId]
-        onExited: {
+        onExited: (exitCode, _) => {
+            if (exitCode !== 0) console.error("Error while updating title")
             setDesc.taskId = taskId;
             setDesc.newDesc = newDesc;
             setDesc.running = true;
@@ -108,7 +116,10 @@ Singleton {
         property string taskId
         property string newDesc
         command: ["gtasks-cli", "update", "--field", "notes", "--value", newDesc, "--task", taskId]
-        onExited: refreshTasks.running = true;
+        onExited: (exitCode, _) => {
+            if (exitCode !== 0) console.error("Error while updating title")
+            refreshTasks.running = true;
+        }
     }
 
     Process {
@@ -125,6 +136,28 @@ Singleton {
         property string taskId
         command: ["gtasks-cli", "toggleCompleted", "--task", taskId]
         onExited: refreshTasks.running = true;
+    }
+
+    Process {
+        id: createTaskProc
+        running: false
+        property string title
+        property string notes
+        property string dueDateString
+        command: {
+            var commandList = ["gtasks-cli", "insert", "--title", title]
+            if (notes !== "") {
+                commandList.push("--notes")
+                commandList.push(notes)
+            }
+            if (dueDateString !== "") {
+                commandList.push("--due")
+                commandList.push(dueDateString)
+            }
+            return commandList;
+        }
+        onExited: refreshTasks.running = true;
+
     }
 
     Process {

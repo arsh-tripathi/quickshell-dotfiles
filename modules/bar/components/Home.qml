@@ -2,7 +2,7 @@ import QtQuick.Controls
 
 Button {
     id: home
-    text: "A"
+    text: "󰣇 "
     implicitHeight: 30
     implicitWidth: 30
 }

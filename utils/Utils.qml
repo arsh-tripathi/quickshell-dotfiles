@@ -200,15 +200,28 @@ Singleton {
 
     property bool muted: false
 
+    function toggleMute() {
+        setMute.running = true;
+    }
+
     Process {
         id: getMute
         running: true
         command: ["pactl", "get-sink-mute", "@DEFAULT_SINK@"]
         stdout: StdioCollector {
             onStreamFinished: {
-                root.muted = text.split(':').trim() === "yes"
+                root.muted = text.split(':')[1].trim() === "yes"
             }
         }
         onRunningChanged: if (!running && root.refresh) running = true;
+    }
+
+
+    Process {
+        id: setMute
+        command: ["pactl", "set-sink-mute", "@DEFAULT_SINK@", "toggle"]
+        onExited: (exitCode, _) => {
+            if (exitCode === 0) root.muted = !root.muted
+        }
     }
 }

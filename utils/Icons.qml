@@ -7,14 +7,14 @@ Singleton {
     id: root
     function getNetworkIcon(strength: int): string {
         if (strength >= 80)
-            return "󰤨 "
+            return "󰤨"
         if (strength >= 60)
-            return "󰤥 "
+            return "󰤥"
         if (strength >= 40)
-            return "󰤢 "
+            return "󰤢"
         if (strength >= 20)
-            return "󰤟 "
-        return "󰤯 "
+            return "󰤟"
+        return "󰤯"
     }
 
     function getBluetoothIcon(icon: string): string {

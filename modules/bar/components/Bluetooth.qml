@@ -1,3 +1,4 @@
+import QtQuick
 import QtQuick.Controls
 import Quickshell.Bluetooth
 import qs.utils
@@ -17,9 +18,26 @@ Button {
         ) {
             return Icons.getBluetoothIcon(devices[0].icon);
         } else {
-            return "󰂱 "
+            return "󰂱"
         }
 
+    }
+    background: Rectangle {
+        color: "white"
+        anchors.fill: parent
+    }
+    contentItem: Text {
+        text: bluetooth.text
+        color: "#C44658"
+        font {
+            pointSize: 12
+            family: "FiraCodeNerdFont"
+            bold: false
+        }
+        anchors.centerIn: parent
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
+        anchors.horizontalCenterOffset: -1
     }
     implicitHeight: 30
     implicitWidth: 30

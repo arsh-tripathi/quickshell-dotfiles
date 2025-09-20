@@ -7,9 +7,16 @@ PopupWindow {
     property bool hoveringButton: false
     property bool clickedButton: false
     property bool hovered: hover.hovered
-    visible: hover.hovered || hoveringButton || clickedButton
+    property bool vis: hover.hovered || hoveringButton || clickedButton
     property alias contentItem: content
     default property alias content: content.data
+    onVisChanged: reset.restart()
+    Timer {
+        id: reset
+        running: false
+        interval: 50
+        onTriggered: root.visible = root.vis
+    }
     Item {
         id: content
         anchors.fill: parent

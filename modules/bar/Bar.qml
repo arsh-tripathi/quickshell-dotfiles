@@ -35,7 +35,7 @@ Variants {
                 ColumnLayout {
                     id: topList
                     anchors.top: parent.top
-                    anchors.margins: parent.margin
+                    // anchors.margins: parent.margin
                     Home {
                         id: home
                         Home_Menu {
@@ -64,6 +64,7 @@ Variants {
                 ColumnLayout {
                     id: list
                     anchors.bottom: parent.bottom
+                    spacing: 0
                     // anchors.margins: parent.margin
                     Clock {
                         id: clock
@@ -76,6 +77,10 @@ Variants {
                         HoverButtonHandler {
                             menu_id: clock_menu
                         }
+                    }
+                    Rectangle {
+                        color: "transparent"
+                        implicitHeight: 40
                     }
                     Network {
                         id: network
@@ -112,6 +117,10 @@ Variants {
                         HoverButtonHandler {
                             menu_id: power_menu
                         }
+                    }
+                    Rectangle {
+                        color: "transparent"
+                        implicitHeight: 40
                     }
                     Logout {
                         id: logout

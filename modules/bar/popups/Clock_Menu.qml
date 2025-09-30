@@ -20,6 +20,11 @@ PopupMenu {
             id: times
             property int numTimers: 0
             property list<TimerInfo> timers
+            ClockWidget {
+                hours: Time.hours
+                minutes: Time.minutes
+                seconds: Time.seconds
+            }
             Repeater {
                 model: [
                     ["America/Toronto", "EDT"],

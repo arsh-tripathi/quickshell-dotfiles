@@ -16,15 +16,13 @@ ColumnLayout {
             required property var modelData
             text: modelData.id
             visible: {
-                console.log("Screen: ", modelData.id)
                 if (!modelData.monitor) {
                     Hyprland.refreshMonitors();
                     Hyprland.refreshToplevels();
                     Hyprland.refreshWorkspaces();
                     return false;
                 }
-                console.log("\tMonitor: " , modelData.monitor.name)
-                return modelData.monitor === Hyprland.monitorFor(workspaces.screen)
+                return modelData.monitor.name === workspaces.screen.name
             }
             background: Rectangle {
                 color: (workspace.modelData.focused) ? "white" :

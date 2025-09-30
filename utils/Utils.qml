@@ -8,7 +8,7 @@ import Quickshell.Hyprland
 Singleton {
     id: root
     function fitString(str: string, length: int): string {
-        if (str.length > length) return str.slice(0, length);
+        if (str.length > length) return str.slice(0, length - 3) + "...";
         else return str.padEnd(length, ' ');
     }
 

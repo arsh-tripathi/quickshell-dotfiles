@@ -9,6 +9,7 @@ PopupWindow {
     property bool hovered: hover.hovered
     property bool vis: hover.hovered || hoveringButton || clickedButton
     property alias contentItem: content
+    property color backgroundColor: "white"
     default property alias content: content.data
     onVisChanged: reset.restart()
     Timer {
@@ -53,7 +54,7 @@ PopupWindow {
         ]
         Rectangle {
             anchors.fill: parent
-            color: "white"
+            color: root.backgroundColor
         }
     }
     HoverHandler {

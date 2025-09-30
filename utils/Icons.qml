@@ -19,16 +19,16 @@ Singleton {
 
     function getBluetoothIcon(icon: string): string {
         if (icon.includes("headset") || icon.includes("headphones"))
-            return "󰥰 ";
+            return "󰥰";
         if (icon.includes("audio"))
-            return "󰂰 ";
+            return "󰂰";
         if (icon.includes("phone"))
-            return "󰏳 ";
+            return "󰏳";
         if (icon.includes("mouse"))
-            return "󰦋 ";
+            return "󰦋";
         if (icon.includes("keyboard"))
-            return "󰌌 ";
-        return " ";
+            return "󰌌";
+        return "";
     }
 
     function getBatteryIcon(charge: real): string {

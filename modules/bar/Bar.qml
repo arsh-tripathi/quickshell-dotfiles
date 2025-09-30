@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import "components"
@@ -124,15 +125,12 @@ Variants {
                     }
                     Logout {
                         id: logout
-                        Logout_Menu {
-                            id: logout_menu
-                            anchor.window: bar
-                            anchor.rect.x: logout.width
-                            anchor.rect.y: list.y + logout.y
+                        Process {
+                            id: wlogout
+                            command: ["wlogout", "--buttons-per-row", "6"]
+                            running: false
                         }
-                        HoverButtonHandler {
-                            menu_id: logout_menu
-                        }
+                        onClicked: wlogout.running = true;
                     }
                 }
                 color: BarConfig.barColor

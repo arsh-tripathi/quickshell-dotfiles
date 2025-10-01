@@ -3,86 +3,56 @@ import Quickshell
 import Quickshell.Io
 import qs.services
 
-Item {
-    width: 200
-    height: 200
+Canvas {
+    width: 160
+    height: 160
     id: clock
     required property int hours
     required property int minutes
     required property int seconds
 
-    property real hourAngle: (hours % 12 + minutes  / 60.0) * 30
-    property real minuteAngle: (minutes + seconds / 60.0) * 6
-    property real secondAngle: seconds * 6
-    Rectangle {
-        anchors.fill: parent
-        radius: width / 2
-        color: "transparent"
-        border.color: "#1E1E1E"
+    property real hourAngle: (hours % 12 + minutes  / 60.0) * 30 * Math.PI / 180
+    property real minuteAngle: (minutes + seconds / 60.0) * 6 * Math.PI / 180
+    property real secondAngle: seconds * 6 * Math.PI / 180
+
+    onSecondsChanged: requestPaint()
+
+    onPaint: {
+        var ctx = getContext("2d"); //get 2D Context
+        ctx.reset();
+
+        const centerX = width / 2;
+        const centerY = height / 2;
+        drawCircle(ctx, centerX, centerY, 75, "#1E1E1E", "transparent", true)
+        drawHand(ctx, hourAngle, 45, 7, "white", centerX, centerY);
+        drawHand(ctx, minuteAngle, 60, 3, "white", centerX, centerY);
+        drawHand(ctx, secondAngle, 65, 1.5, "#C44658", centerX, centerY);
+        drawCircle(ctx, centerX, centerY, 4.5, "white", "transparent", false)
     }
 
-    Rectangle {
-        id: hour
-        width: 6
-        height: clock.height * 0.25
-        radius: 3
-        color: "black"
-        anchors.centerIn: parent
-        transform: [
-            Rotation {
-                angle: clock.hourAngle + 180
-                origin.x: hour.width / 2
-            },
-            Translate {
-                y: hour.height / 2
-            }
-        ]
+    function drawCircle(ctx, x: real, y: real, radius: real, fill, stroke, hasShadow: bool) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = fill;
+        if (hasShadow) {
+            ctx.shadowColor = "white";
+            ctx.shadowBlur = 3;
+        }
+        ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.stroke();
+        ctx.restore();
     }
 
-    // minute hand
-    Rectangle {
-        id: minute
-        width: 4
-        height: clock.height * 0.35
-        radius: 2
-        color: "darkblue"
-        anchors.centerIn: parent
-        transform: [
-            Rotation {
-                angle: clock.minuteAngle + 180
-                origin.x: minute.width / 2
-            },
-            Translate {
-                y: minute.height / 2
-            }
-
-        ]
-    }
-
-    // second hand
-    Rectangle {
-        id: second
-        width: 2
-        height: clock.height * 0.40
-        color: "red"
-        anchors.centerIn: parent
-        transform: [
-            Rotation {
-                angle: clock.secondAngle + 180
-                origin.x: second.width / 2
-            },
-            Translate {
-                y: second.height / 2
-            }
-        ]
-    }
-
-    // center dot
-    Rectangle {
-        width: 10
-        height: 10
-        radius: 5
-        color: "black"
-        anchors.centerIn: parent
+    function drawHand(ctx, angle: real, length: real, width: real, color, x: real, y: real) {
+        // ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + length * Math.sin(angle), y - length * Math.cos(angle));
+        ctx.strokeStyle = color;
+        ctx.lineCap = "round"
+        ctx.lineWidth = width;
+        ctx.stroke();
     }
 }

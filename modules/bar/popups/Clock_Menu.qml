@@ -11,64 +11,137 @@ import qs.services
 
 PopupMenu {
     id: clock_popup
-    implicitHeight: 150
+    implicitHeight: 350
     implicitWidth: 450
+    backgroundColor: "#1E1E1E"
     ScrollView {
-        height: 150
+        height: 350
         width: 450
         ColumnLayout {
             id: times
             property int numTimers: 0
             property list<TimerInfo> timers
-            ClockWidget {
-                hours: Time.hours
-                minutes: Time.minutes
-                seconds: Time.seconds
+            RowLayout {
+                id: timeRow
+                property string currentTZ: "America/Toronto"
+                ClockWidget {
+                    id: clock
+                    Layout.leftMargin: 10
+                    hours: parseInt(Time.offsetAndFormat(timeRow.currentTZ, "hh"))
+                    minutes: parseInt(Time.offsetAndFormat(timeRow.currentTZ, "mm"))
+                    seconds: parseInt(Time.offsetAndFormat(timeRow.currentTZ, "ss"))
+                }
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Repeater {
+                        model: [
+                            ["America/Toronto", "EDT"],
+                            ["Asia/Kolkata", "IST"],
+                            ["UTC", "UTC"]
+                        ]
+                        TimeZoneInfo {
+                            id: timeZone
+                            currentTZ: timeRow.currentTZ
+                            onClicked: {
+                                timeRow.currentTZ = modelData[0];
+                                console.log("Hello")
+                            }
+                        }
+                    }
+                }
             }
-            Repeater {
-                model: [
-                    ["America/Toronto", "EDT"],
-                    ["Asia/Kolkata", "IST"],
-                    ["UTC", "UTC"]
-                ]
-                Text {
-                    required property var modelData
-                    text: "[" + modelData[1] + "] " + Time.offsetAndFormat(modelData[0], "hh:mm:ss ddd MMM dd yyyy")
-                    font.family: "FiraCodeNerdFont"
+            Label {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Stopwatch"
+                leftPadding: 10
+                rightPadding: 10
+                background: Rectangle {
+                    color: "white"
+                    radius: 5
+                }
+                font {
+                    pointSize: 12
+                    family: "FiraCodeNerdFont"
+                }
+            }
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                color: (stopwatch.running) ? "#C44658" : "white"
+                text: {
+                    const hours = Math.floor(stopwatch.seconds / 3600);
+                    const minutes = Math.floor((stopwatch.seconds % 3600) / 60);
+                    const seconds = stopwatch.seconds % 60;
+                    const hoursText = ((hours < 10) ? "0" : "") + hours;
+                    const minutesText = ((minutes < 10) ? "0" : "") + minutes;
+                    const secondsText = ((seconds < 10) ? "0" : "") + seconds;
+                    return hoursText + ":" + minutesText + ":" + secondsText;
+                }
+                font {
+                    pointSize: 12
+                    family: "FiraCodeNerdFont"
                 }
             }
             RowLayout {
+                Layout.alignment: Qt.AlignHCenter
                 id: stopwatch
                 property bool running: false
                 property int seconds: 0
-                Text {
-                    text: "Stopwatch"
-                }
-                Text {
-                    text: {
-                        const hours = Math.floor(stopwatch.seconds / 3600);
-                        const minutes = Math.floor((stopwatch.seconds % 3600) / 60);
-                        const seconds = stopwatch.seconds % 60;
-                        const hoursText = ((hours < 10) ? "0" : "") + hours;
-                        const minutesText = ((minutes < 10) ? "0" : "") + minutes;
-                        const secondsText = ((seconds < 10) ? "0" : "") + seconds;
-                        return hoursText + ":" + minutesText + ":" + secondsText;
+                Button {
+                    id: pause
+                    text: ""
+                    implicitWidth: pause.height
+                    onClicked: stopwatch.running = false;
+                    contentItem: Text {
+                        text: pause.text
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font {
+                            pointSize: 12
+                            family: "FiraCodeNerdFont"
+                        }
+                    }
+                    background: Rectangle {
+                        radius: pause.height / 2
+                        color: "white"
                     }
                 }
                 Button {
-                    text: "Start"
-                    implicitWidth: 50
+                    id: play
+                    text: ""
+                    implicitWidth: play.height
                     onClicked: stopwatch.running = true;
+                    contentItem: Text {
+                        text: play.text
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font {
+                            pointSize: 12
+                            family: "FiraCodeNerdFont"
+                        }
+                    }
+                    background: Rectangle {
+                        radius: play.height / 2
+                        color: "white"
+                    }
                 }
                 Button {
-                    text: "Stop"
-                    implicitWidth: 50
-                    onClicked: stopwatch.running = false;
-                }
-                Button {
-                    text: "Reset"
-                    implicitWidth: 50
+                    id: replay
+                    text: ""
+                    implicitWidth: replay.height
                     onClicked: stopwatch.seconds = 0;
+                    contentItem: Text {
+                        text: replay.text
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font {
+                            pointSize: 12
+                            family: "FiraCodeNerdFont"
+                        }
+                    }
+                    background: Rectangle {
+                        radius: replay.height / 2
+                        color: "white"
+                    }
                 }
                 Component.onCompleted: {
                     Time.tick.connect(() => {
@@ -79,6 +152,15 @@ PopupMenu {
             Button {
                 text: "Add Timer"
                 onClicked: times.timers.push(timerInfo.createObject(times, {}))
+            }
+            TimerWidget {
+                id: timerClock
+                totalHours: 0
+                totalMinutes: 0
+                totalSeconds: 0
+                hours: 0
+                minutes: 0
+                seconds: 0
             }
             Repeater {
                 model: times.timers

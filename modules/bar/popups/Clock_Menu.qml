@@ -20,6 +20,7 @@ PopupMenu {
         ColumnLayout {
             id: times
             property int numTimers: 0
+            property int currTimer: -1
             property list<TimerInfo> timers
             RowLayout {
                 id: timeRow
@@ -42,10 +43,8 @@ PopupMenu {
                         TimeZoneInfo {
                             id: timeZone
                             currentTZ: timeRow.currentTZ
-                            onClicked: {
-                                timeRow.currentTZ = modelData[0];
-                                console.log("Hello")
-                            }
+                            onClicked: timeRow.currentTZ = modelData[0];
+                            
                         }
                     }
                 }
@@ -149,18 +148,94 @@ PopupMenu {
                     })
                 }
             }
-            Button {
-                text: "Add Timer"
-                onClicked: times.timers.push(timerInfo.createObject(times, {}))
-            }
-            TimerWidget {
-                id: timerClock
-                totalHours: 0
-                totalMinutes: 0
-                totalSeconds: 0
-                hours: 0
-                minutes: 0
-                seconds: 0
+            RowLayout {
+                Layout.preferredWidth: 400
+                Layout.fillWidth: true
+                spacing: 20
+                TimerWidget {
+                    id: timerClock
+                    totalHours: 0
+                    totalMinutes: 0
+                    totalSeconds: 0
+                    hours: 0
+                    minutes: 0
+                    seconds: 0
+                }
+                ColumnLayout {
+                    id: tInfo
+                    Layout.fillWidth: true
+                    Button {
+                        id: addTimer
+                        Layout.fillWidth: true
+                        text: "+ Add Timer"
+                        onClicked: {
+                            times.timers.push(timerInfo.createObject(times, {}))
+                            times.currTimer = times.timers.length - 1
+                        }
+                        contentItem: Text {
+                            text: addTimer.text
+                            color: "white"
+                            font {
+                                pointSize: 12
+                                family: "FiraCodeNerdFont"
+                            }
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                        background: Rectangle {
+                            color: "transparent"
+                            border.color: "white"
+                            border.width: 1
+                            radius: addTimer.height / 2
+                        }
+                    }
+                    property TimerInfo currTimerInfo: times.currTimer !== -1 ? times.timers[times.currTimer] : null
+                    Loader {
+                        Layout.fillWidth: true
+                        active: times.currTimer !== -1
+                        sourceComponent: Label {
+                            id: timerName
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            text: tInfo.currTimerInfo.name
+                            color: "black"
+                            horizontalAlignment: Text.AlignHCenter
+                            font {
+                                pointSize: 12
+                                family: "FiraCodeNerdFont"
+                            }
+                            background: Rectangle {
+                                color: "white"
+                                radius: timerName.height / 2
+                            }
+                        }
+                    }
+                    Loader {
+                        Layout.fillWidth: true
+                        active: times.currTimer !== -1
+                        sourceComponent: Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.fillWidth: true
+                            text: {
+                                const hoursText = ((tInfo.currTimerInfo.hours < 10) ? "0" : "") + tInfo.currTimerInfo.hours;
+                                const minutesText = ((tInfo.currTimerInfo.minutes < 10) ? "0" : "") + tInfo.currTimerInfo.minutes;
+                                const secondsText = ((tInfo.currTimerInfo.seconds < 10) ? "0" : "") + tInfo.currTimerInfo.seconds;
+                                return hoursText + ":" + minutesText + ":" + secondsText;
+                            }
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            font {
+                                pointSize: 12
+                                family: "FiraCodeNerdFont"
+                            }
+                        }
+                    }
+                    Loader {
+                        active: times.currTimer !== -1
+                        sourceComponent: RowLayout {
+                        }
+                    }
+                }
             }
             Repeater {
                 model: times.timers

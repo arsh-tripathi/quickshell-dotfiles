@@ -20,6 +20,9 @@ Canvas {
     }
 
     onSecondsChanged: requestPaint()
+    onTotalHoursChanged: requestPaint()
+    onTotalMinutesChanged: requestPaint()
+    onTotalSecondsChanged: requestPaint()
 
     onPaint: {
         var ctx = getContext("2d"); //get 2D Context

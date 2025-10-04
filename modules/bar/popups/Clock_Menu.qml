@@ -11,11 +11,11 @@ import qs.services
 
 PopupMenu {
     id: clock_popup
-    implicitHeight: 350
+    implicitHeight: 500
     implicitWidth: 450
     backgroundColor: "#1E1E1E"
     ScrollView {
-        height: 350
+        height: 500
         width: 450
         ColumnLayout {
             id: times
@@ -154,12 +154,12 @@ PopupMenu {
                 spacing: 20
                 TimerWidget {
                     id: timerClock
-                    totalHours: 0
-                    totalMinutes: 0
-                    totalSeconds: 0
-                    hours: 0
-                    minutes: 0
-                    seconds: 0
+                    totalHours: tInfo.currTimerInfo ? tInfo.currTimerInfo.timerHours : 0
+                    totalMinutes: tInfo.currTimerInfo ? tInfo.currTimerInfo.timerMinutes : 0
+                    totalSeconds: tInfo.currTimerInfo ? tInfo.currTimerInfo.timerSeconds : 0
+                    hours: tInfo.currTimerInfo ? tInfo.currTimerInfo.hours : 0
+                    minutes: tInfo.currTimerInfo ? tInfo.currTimerInfo.minutes : 0
+                    seconds: tInfo.currTimerInfo ? tInfo.currTimerInfo.seconds : 0
                 }
                 ColumnLayout {
                     id: tInfo
@@ -193,7 +193,7 @@ PopupMenu {
                     Loader {
                         Layout.fillWidth: true
                         active: times.currTimer !== -1
-                        sourceComponent: Label {
+                        readonly property Component title: Label {
                             id: timerName
                             Layout.alignment: Qt.AlignHCenter
                             Layout.fillWidth: true
@@ -209,11 +209,15 @@ PopupMenu {
                                 radius: timerName.height / 2
                             }
                         }
+                        readonly property Component edit: TextEdit {
+
+                        }
+                        sourceComponent: tInfo.currTimerInfo.editing ? edit : title
                     }
                     Loader {
                         Layout.fillWidth: true
                         active: times.currTimer !== -1
-                        sourceComponent: Text {
+                        readonly property Component title: Text {
                             Layout.alignment: Qt.AlignHCenter
                             Layout.fillWidth: true
                             text: {
@@ -229,10 +233,51 @@ PopupMenu {
                                 family: "FiraCodeNerdFont"
                             }
                         }
+                        readonly property Component edit: TextEdit {
+                        }
+                        sourceComponent: tInfo.currTimerInfo.editing ? edit : title
                     }
                     Loader {
+                        Layout.alignment: Qt.AlignHCenter
                         active: times.currTimer !== -1
                         sourceComponent: RowLayout {
+                            Layout.alignment: Qt.AlignHCenter
+                            Button {
+                                id: control
+                                text: tInfo.currTimerInfo.running ? "" : ""
+                                contentItem: Text {
+                                    text: control.text
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    font {
+                                        pointSize: 12
+                                        family: "FiraCodeNerdFont"
+                                    }
+                                }
+                                background: Rectangle {
+                                    implicitWidth: 40
+                                    radius: control.height / 2
+                                }
+                                onClicked: tInfo.currTimerInfo.running = !tInfo.currTimerInfo.running
+                            }
+                            Button {
+                                id: reset
+                                text: ""
+                                contentItem: Text {
+                                    text: reset.text
+                                    horizontalAlignment: Text.AlignHCenter
+                                    verticalAlignment: Text.AlignVCenter
+                                    font {
+                                        pointSize: 12
+                                        family: "FiraCodeNerdFont"
+                                    }
+                                }
+                                background: Rectangle {
+                                    implicitWidth: 40
+                                    radius: reset.height / 2
+                                }
+                                onClicked: tInfo.currTimerInfo.secondsLeft = tInfo.currTimerInfo.totalSeconds
+                            }
                         }
                     }
                 }
@@ -357,6 +402,7 @@ PopupMenu {
                         onClicked: {
                             var timers = times.timers
                             timers.splice(timer.index, 1)
+                            times.currTimer = -1;
                         }
                     }
                     Component.onCompleted: {
@@ -371,6 +417,9 @@ PopupMenu {
     }
     component TimerInfo: QtObject {
         property int totalSeconds: 0
+        readonly property int timerHours: Math.floor(totalSeconds / 3600)
+        readonly property int timerMinutes: Math.floor((totalSeconds % 3600) / 60)
+        readonly property int timerSeconds: totalSeconds % 60
         property int secondsLeft: 0
         readonly property int hours: Math.floor(secondsLeft / 3600)
         readonly property int minutes: Math.floor((secondsLeft % 3600) / 60)

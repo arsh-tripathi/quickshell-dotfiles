@@ -189,15 +189,17 @@ PopupMenu {
                             radius: addTimer.height / 2
                         }
                     }
-                    property TimerInfo currTimerInfo: times.currTimer !== -1 ? times.timers[times.currTimer] : null
+                    property var currTimerInfo: times.currTimer !== -1 ? times.timers[times.currTimer] : null
                     Loader {
+                        id: nameInfo
                         Layout.fillWidth: true
                         active: times.currTimer !== -1
+                        property bool editing: false
                         readonly property Component title: Label {
                             id: timerName
                             Layout.alignment: Qt.AlignHCenter
                             Layout.fillWidth: true
-                            text: tInfo.currTimerInfo.name
+                            text: tInfo.currTimerInfo ? tInfo.currTimerInfo.name : ""
                             color: "black"
                             horizontalAlignment: Text.AlignHCenter
                             font {
@@ -208,19 +210,73 @@ PopupMenu {
                                 color: "white"
                                 radius: timerName.height / 2
                             }
+                            Button {
+                                anchors.right: timerName.right
+                                anchors.rightMargin: height
+                                text: ""
+                                implicitHeight: timerName.height
+                                implicitWidth: height
+                                font {
+                                    pointSize: 12
+                                    family: "FiraCodeNerdFont"
+                                }
+                                background: Rectangle {
+                                    color: "transparent"
+                                    radius: timerName.height / 2
+                                }
+                                onClicked: {
+                                    tInfo.currTimerInfo.editing += 1;
+                                    nameInfo.editing = true;
+                                }
+                            }
                         }
-                        readonly property Component edit: TextEdit {
-
+                        readonly property Component edit: TextField {
+                            id: timerEdit
+                            text: tInfo.currTimerInfo.name
+                            horizontalAlignment: Text.AlignHCenter
+                            background: Rectangle {
+                                color: "white"
+                                radius: timerEdit.height / 2
+                            }
+                            activeFocusOnPress: true
+                            font {
+                                pointSize: 12
+                                family: "FiraCodeNerdFont"
+                            }
+                            Button {
+                                anchors.right: timerEdit.right
+                                anchors.rightMargin: height
+                                text: ""
+                                implicitHeight: timerEdit.height
+                                implicitWidth: height
+                                font {
+                                    pointSize: 12
+                                    family: "FiraCodeNerdFont"
+                                }
+                                background: Rectangle {
+                                    color: "transparent"
+                                    radius: timerEdit.height / 2
+                                }
+                                onClicked: {
+                                    tInfo.currTimerInfo.editing -= 1;
+                                    tInfo.currTimerInfo.name = timerEdit.text
+                                    nameInfo.editing = false;
+                                }
+                            }
                         }
-                        sourceComponent: tInfo.currTimerInfo.editing ? edit : title
+                        sourceComponent: editing ? edit : title
                     }
                     Loader {
+                        id: timeInfo
                         Layout.fillWidth: true
                         active: times.currTimer !== -1
+                        property bool editing: false
                         readonly property Component title: Text {
+                            id: timeDisplay
                             Layout.alignment: Qt.AlignHCenter
                             Layout.fillWidth: true
                             text: {
+                                if (!tInfo.currTimerInfo) return "00:00:00";
                                 const hoursText = ((tInfo.currTimerInfo.hours < 10) ? "0" : "") + tInfo.currTimerInfo.hours;
                                 const minutesText = ((tInfo.currTimerInfo.minutes < 10) ? "0" : "") + tInfo.currTimerInfo.minutes;
                                 const secondsText = ((tInfo.currTimerInfo.seconds < 10) ? "0" : "") + tInfo.currTimerInfo.seconds;
@@ -232,10 +288,86 @@ PopupMenu {
                                 pointSize: 12
                                 family: "FiraCodeNerdFont"
                             }
+                            Button {
+                                id: editTime
+                                anchors.right: timeDisplay.right
+                                anchors.rightMargin: height
+                                text: ""
+                                implicitHeight: timeDisplay.height
+                                implicitWidth: height
+                                contentItem: Text {
+                                    text: editTime.text
+                                    color: "white"
+                                    font {
+                                        pointSize: 12
+                                        family: "FiraCodeNerdFont"
+                                    }
+                                }
+                                background: Rectangle {
+                                    color: "transparent"
+                                    radius: timeDisplay.height / 2
+                                }
+                                onClicked: {
+                                    tInfo.currTimerInfo.editing += 1;
+                                    timeInfo.editing = true;
+                                }
+                            }
                         }
-                        readonly property Component edit: TextEdit {
+                        readonly property Component edit: RowLayout {
+                            id: timeEdit
+                            implicitHeight: timerClock.height / 2
+                            spacing: 10
+                            StyledTumbler {
+                                id: hours
+                                model: 60
+                                visibleItemCount: 3
+                                Component.onCompleted: {
+                                    positionViewAtIndex(tInfo.currTimerInfo.timerHours, Tumbler.Center)
+                                }
+                            }
+                            StyledTumbler {
+                                id: minutes
+                                model: 60
+                                visibleItemCount: 3
+                                Component.onCompleted: {
+                                    positionViewAtIndex(tInfo.currTimerInfo.timerMinutes, Tumbler.Center)
+                                }
+                            }
+                            StyledTumbler {
+                                id: seconds
+                                model: 60
+                                visibleItemCount: 3
+                                Component.onCompleted: {
+                                    positionViewAtIndex(tInfo.currTimerInfo.timerSeconds, Tumbler.Center)
+                                }
+                            }
+                            Button {
+                                id: saveTime
+                                text: ""
+                                implicitWidth: height
+                                Layout.alignment: Qt.AlignVCenter
+                                contentItem: Text {
+                                    text: saveTime.text
+                                    color: "white"
+                                    font {
+                                        pointSize: 12
+                                        family: "FiraCodeNerdFont"
+                                    }
+                                    verticalAlignment: Text.AlignHCenter
+                                }
+                                background: Rectangle {
+                                    color: "transparent"
+                                    radius: timeEdit.height / 2
+                                }
+                                onClicked: {
+                                    tInfo.currTimerInfo.totalSeconds = hours.currentIndex * 3600 + minutes.currentIndex * 60 + seconds.currentIndex;
+                                    tInfo.currTimerInfo.secondsLeft = tInfo.currTimerInfo.totalSeconds;
+                                    tInfo.currTimerInfo.editing -= 1;
+                                    timeInfo.editing = false;
+                                }
+                            }
                         }
-                        sourceComponent: tInfo.currTimerInfo.editing ? edit : title
+                        sourceComponent: editing ? edit : title
                     }
                     Loader {
                         Layout.alignment: Qt.AlignHCenter
@@ -244,7 +376,7 @@ PopupMenu {
                             Layout.alignment: Qt.AlignHCenter
                             Button {
                                 id: control
-                                text: tInfo.currTimerInfo.running ? "" : ""
+                                text: (tInfo.currTimerInfo && tInfo.currTimerInfo.running) ? "" : ""
                                 contentItem: Text {
                                     text: control.text
                                     horizontalAlignment: Text.AlignHCenter
@@ -284,132 +416,127 @@ PopupMenu {
             }
             Repeater {
                 model: times.timers
-                RowLayout {
-                    id: timer
+                Rectangle {
+                    id: background
+                    Layout.alignment: Qt.AlignHCenter
+                    implicitWidth: timer.width + 2 * timer.height
+                    implicitHeight: timer.height
+                    radius: timer.height
                     required property TimerInfo modelData
                     required property int index
-                    Text {
-                        visible: !timer.modelData.editing
-                        text: Utils.fitString(timer.modelData.name, 20)
-                    }
-                    TextField {
-                        id: nameField
-                        visible: timer.modelData.editing
-                        text: timer.modelData.name
-                        Keys.onReturnPressed: timer.modelData.name = text
-                    }
-                    Text {
-                        visible: !timer.modelData.editing
-                        text: {
-                            const hoursText = ((timer.modelData.hours < 10) ? "0" : "") + timer.modelData.hours;
-                            const minutesText = ((timer.modelData.minutes < 10) ? "0" : "") + timer.modelData.minutes;
-                            const secondsText = ((timer.modelData.seconds < 10) ? "0" : "") + timer.modelData.seconds;
-                            return hoursText + ":" + minutesText + ":" + secondsText;
-                        }
-                        font.family: "FiraCodeNerdFont"
+                    property bool isCurrent: times.currTimer === index
+                    color: isCurrent ? "white": "transparent"
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: times.currTimer = background.index;
                     }
                     RowLayout {
-                        visible: timer.modelData.editing
-                        SpinBox {
-                            id: hours
-                            editable: true
-                            implicitWidth: 50
-                            from: 0
-                            to: 99
-                            value: timer.modelData.hours
-
-                            validator: IntValidator { bottom: 0; top: 99 }
-
-                            textFromValue: function(value) {
-                                return value.toString().padStart(2, "0")
-                            }
-
-                            valueFromText: function(text) {
-                                return parseInt(text)
+                        id: timer
+                        anchors.centerIn: parent
+                        property TimerInfo modelData: background.modelData
+                        property int index: background.index
+                        Text {
+                            text: timer.modelData.name
+                            color: background.isCurrent ? "#1E1E1E" : "white"
+                            font {
+                                pointSize: 12
+                                family: "FiraCodeNerdFont"
                             }
                         }
-                        SpinBox {
-                            id: minutes
-                            editable: true
-                            from: 0
-                            to: 59
-                            value: timer.modelData.minutes
-                            implicitWidth: 50
-
-                            validator: IntValidator { bottom: 0; top: 59 }
-
-                            textFromValue: function(value) {
-                                return value.toString().padStart(2, "0")
+                        Item {
+                            implicitWidth: 20
+                        }
+                        Text {
+                            text: {
+                                const hoursText = ((timer.modelData.hours < 10) ? "0" : "") + timer.modelData.hours;
+                                const minutesText = ((timer.modelData.minutes < 10) ? "0" : "") + timer.modelData.minutes;
+                                const secondsText = ((timer.modelData.seconds < 10) ? "0" : "") + timer.modelData.seconds;
+                                return hoursText + ":" + minutesText + ":" + secondsText;
                             }
-
-                            valueFromText: function(text) {
-                                return parseInt(text)
+                            color: background.isCurrent ? "#1E1E1E" : "white"
+                            font {
+                                pointSize: 12
+                                family: "FiraCodeNerdFont"
                             }
                         }
-                        SpinBox {
-                            id: seconds
-                            editable: true
-                            from: 0
-                            to: 59
-                            value: timer.modelData.seconds
-                            implicitWidth: 50
-
-                            validator: IntValidator { bottom: 0; top: 59 }
-
-                            textFromValue: function(value) {
-                                return value.toString().padStart(2, "0")
-                            }
-
-                            valueFromText: function(text) {
-                                return parseInt(text)
-                            }
+                        Item {
+                            implicitWidth: 20
                         }
-                    }
-                    Button {
-                        visible: !timer.modelData.editing
-                        text: "Start"
-                        implicitWidth: 50
-                        onClicked: timer.modelData.running = true;
-                    }
-                    Button {
-                        visible: !timer.modelData.editing
-                        text: "Stop"
-                        implicitWidth: 50
-                        onClicked: timer.modelData.running = false;
-                    }
-                    Button {
-                        text: (timer.modelData.editing) ? "Save" : "Edit"
-                        implicitWidth: 50
-                        onClicked: {
-                            timer.modelData.running = false;
-                            timer.modelData.editing = !timer.modelData.editing;
-                            if (!timer.modelData.editing) {
-                                timer.modelData.name = nameField.text
-                                timer.modelData.totalSeconds = hours.value * 3600 + minutes.value * 60 + seconds.value;
-                                timer.modelData.secondsLeft = timer.modelData.totalSeconds;
+                        Button {
+                            id: playTimer
+                            text: timer.modelData.running ? "" : ""
+                            implicitWidth: playTimer.height
+                            onClicked: timer.modelData.running = !timer.modelData.running;
+                            contentItem: Text {
+                                text: playTimer.text
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font {
+                                    pointSize: 12
+                                    family: "FiraCodeNerdFont"
+                                }
+                            }
+                            background: Rectangle {
+                                radius: playTimer.height / 2
                             }
                         }
-                    }
-                    Button {
-                        visible: !timer.modelData.editing
-                        text: "Reset"
-                        implicitWidth: 50
-                        onClicked: timer.modelData.secondsLeft = timer.modelData.totalSeconds;
-                    }
-                    Button {
-                        text: "Delete"
-                        implicitWidth: 50
-                        onClicked: {
-                            var timers = times.timers
-                            timers.splice(timer.index, 1)
-                            times.currTimer = -1;
+                        Button {
+                            id: resetTimer
+                            text: ""
+                            implicitWidth: resetTimer.height
+                            contentItem: Text {
+                                text: resetTimer.text
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.horizontalCenterOffset: -1.5
+                                font {
+                                    pointSize: 12
+                                    family: "FiraCodeNerdFont"
+                                }
+                            }
+                            background: Rectangle {
+                                implicitWidth: 40
+                                radius: resetTimer.height / 2
+                            }
+                            onClicked: timer.modelData.secondsLeft = timer.modelData.totalSeconds
                         }
-                    }
-                    Component.onCompleted: {
-                        Time.tick.connect(() => {
+                        Button {
+                            id: deleteTimer
+                            text: ""
+                            implicitWidth: deleteTimer.height
+                            contentItem: Text {
+                                text: deleteTimer.text
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                font {
+                                    pointSize: 12
+                                    family: "FiraCodeNerdFont"
+                                }
+                            }
+                            background: Rectangle {
+                                implicitWidth: 40
+                                radius: deleteTimer.height / 2
+                            }
+                            onClicked: {
+                                var timers = times.timers
+                                timers.splice(timer.index, 1)
+                                if (timers.length === 0) {
+                                    times.currTimer = -1;
+                                } else if (times.currTimer > timer.index) {
+                                    times.currTimer -= 1;
+                                } else if (times.currTimer === timer.index) {
+                                    times.currTimer = 0;
+                                }
+                            }
+                        }
+                        function handleConnection() {
                             if (!timer || timer.modelData.secondsLeft === 0) timer.modelData.running = false;
                             if (timer && timer.modelData.running) timer.modelData.secondsLeft -= 1
-                        })
+                        }
+                        Component.onCompleted: {
+                            Time.tick.connect(handleConnection)
+                        }
+                        Component.onDestruction: Time.tick.disconnect(handleConnection)
                     }
                 }
             }
@@ -425,7 +552,7 @@ PopupMenu {
         readonly property int minutes: Math.floor((secondsLeft % 3600) / 60)
         readonly property int seconds: secondsLeft % 60
         property bool running: false
-        property bool editing: false
+        property int editing: 0
         property string name: "Timer"
     }
 

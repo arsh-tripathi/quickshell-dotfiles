@@ -241,7 +241,7 @@ ColumnLayout {
         visible: Tasks.incomplete.length > 0
     }
     ScrollView {
-        implicitHeight: 100
+        Layout.fillHeight: true
         implicitWidth: 400
         ColumnLayout {
             Repeater {

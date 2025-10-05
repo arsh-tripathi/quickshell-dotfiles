@@ -44,7 +44,6 @@ Singleton {
     }
 
     function removeElement(l: list<var>, index: int): list<var> {
-        console.log(index, l)
         if (index < 0 || index >= l.length) return;
         for (var i = index; i < l.length; i++) {
             l[i] = l[i+1]

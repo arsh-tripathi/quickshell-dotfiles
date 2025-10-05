@@ -8,7 +8,8 @@ import qs.utils
 PopupMenu {
     id: home_popup
     required property var screen
-    implicitHeight: 400
+    backgroundColor: "#1E1E1E"
+    implicitHeight: 500
     implicitWidth: 400
     onVisibleChanged: {
         calendar.refreshTasks()
@@ -16,13 +17,43 @@ PopupMenu {
         Utils.refreshScreenBri = true;
         Utils.refreshVolume = true;
         Utils.refresh = visible;
+        SystemUsage.refCount += (visible) ? 1 : -1
     }
     ColumnLayout {
         RowLayout {
-            Text {
-                text: "󰃞 "
+            Layout.margins: 10
+            SysInfoPie {
+                usage: SystemUsage.cpuPerc
+                total: 1
+                symbol: ""
             }
-            Slider {
+            SysInfoPie {
+                usage: SystemUsage.memUsed
+                total: SystemUsage.memTotal
+                symbol: ""
+            }
+            SysInfoPie {
+                usage: SystemUsage.storageUsed
+                total: SystemUsage.storageTotal
+                symbol: ""
+            }
+        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 20
+            Layout.rightMargin: 20
+            Text {
+                text: "󰃟"
+                color: "white"
+                Layout.preferredWidth: 30
+                font {
+                    pointSize: 15
+                    family: "FiraCodeNerdFont"
+                }
+                horizontalAlignment: Text.AlignHCenter
+            }
+            StyledSlider {
+                Layout.fillWidth: true
                 id: brightnessSlider
                 from: 1
                 to: 100
@@ -32,13 +63,29 @@ PopupMenu {
             }
         }
         RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 20
+            Layout.rightMargin: 20
             Button {
+                id: muteControl
                 text: (Utils.muted || Utils.volume === 0) ? " " : " "
                 implicitHeight: 30
                 implicitWidth: 30
                 onClicked: Utils.toggleMute()
+                background: Rectangle {
+                    color: "transparent"
+                }
+                contentItem: Text {
+                    text: muteControl.text
+                    color: "white"
+                    font {
+                        pointSize: 15
+                        family: "FiraCodeNerdFont"
+                    }
+                }
             }
-            Slider {
+            StyledSlider {
+                Layout.fillWidth: true
                 id: volume
                 from: 0
                 to: 100

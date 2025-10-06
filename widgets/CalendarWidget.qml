@@ -31,22 +31,23 @@ ColumnLayout {
     RowLayout {
         ColumnLayout {
             RowLayout {
+                Layout.fillWidth: true
                 Button {
                     text: " "
                     implicitWidth: 30
                     onClicked: {
-                        if (root.month > 0) root.month -= 1;
+                        if (root.month > 1) root.month -= 1;
                         else {
                             root.month = 12;
                             root.year -= 1;
                         }
-                        Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
-                                       calendar.selectedDate, root.month, root.year)
                     }
                 }
                 Text {
-                    text: Utils.getCalenderHeader(root.month, root.year)
+                    text: grid.title
                     Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
                 }
                 Button {
                     text: " "
@@ -57,50 +58,121 @@ ColumnLayout {
                             root.month = 1;
                             root.year += 1;
                         }
-                        Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
-                                       calendar.selectedDate, root.month, root.year)
                     }
                 }
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                Layout.preferredWidth: calendar.width
             }
             GridLayout {
                 id: calendar
-                columns: 7
-                property int selectedDate: root.date
-                Repeater {
-                    model: ["S", "M", "T", "W", "T", "F", "S"]
-                    Text {
-                        required property string modelData
-                        text: {
-                            return modelData;
+                columns: 2
+                property int selectedDate: -1
+                DayOfWeekRow {
+                    Layout.column: 1
+                    Layout.fillWidth: true
+                    delegate: Text {
+                        required property string narrowName
+                        text: narrowName
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        color: "white"
+                        font {
+                            pointSize: 10
+                            family: "FiraCodeNerdFont"
                         }
-                        Layout.alignment: Qt.AlignCenter
                     }
                 }
-                Repeater {
-                    model: Utils.getMonthNumDays(root.month, root.year)
-                    Button {
-                        id: day
+                WeekNumberColumn {
+                    month: root.month - 1
+                    year: root.year
+                    Layout.fillHeight: true
+                    delegate: Text {
+                        required property int weekNumber
+                        text: weekNumber
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        color: "white"
+                        font {
+                            pointSize: 10
+                            family: "FiraCodeNerdFont"
+                        }
+                    }
+                }
+                MonthGrid {
+                    id: grid
+                    month: root.month - 1
+                    year: root.year
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    delegate: Button {
+                        id: item
+                        required property var model
                         implicitWidth: 25
-                        implicitHeight: 25
-                        required property int index;
-                        text: index + 1
-                        Layout.row: Math.floor((root.startDay + index) / 7) + 1
-                        Layout.column: (root.startDay + index) % 7
+                        implicitHeight: 30
+                        text: grid.locale.toString(model.date, "d")
+                        opacity: model.month === grid.month ? 1: 0.1
                         background: Rectangle {
-                            color: (day.index + 1 === root.date &&
-                                    root.month === parseInt(Time.format("M")) &&
-                                    root.year === parseInt(Time.format("yyyy"))) ? "aqua" : 
-                                    (calendar.selectedDate === day.index + 1) ? "yellow" :"white"
+                            radius: 5
+                            color: (item.model.today) 
+                                        ? "#C44658" 
+                                        : (calendar.selectedDate === item.model.day && 
+                                           root.month - 1 === item.model.month)
+                                            ? "white" 
+                                            : "transparent"
+                            border.color: "white"
+                        }
+                        contentItem: Text {
+                            text: item.text
+                            color:(!item.model.today &&
+                                   calendar.selectedDate === item.model.day && 
+                                   root.month - 1 === item.model.month)
+                                        ? "#1E1E1E" 
+                                        : "white"
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            font {
+                                pointSize: 10
+                                family: "FiraCodeNerdFont"
+                            }
                         }
                         onClicked: {
-                            calendar.selectedDate = index + 1;
-                            Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
-                                           calendar.selectedDate, root.month, root.year)
+                            console.log("TEST")
+                            calendar.selectedDate = model.day
                         }
                     }
                 }
+                // Repeater {
+                //     model: ["S", "M", "T", "W", "T", "F", "S"]
+                //     Text {
+                //         required property string modelData
+                //         text: {
+                //             return modelData;
+                //         }
+                //         Layout.alignment: Qt.AlignCenter
+                //     }
+                // }
+                // Repeater {
+                //     model: Utils.getMonthNumDays(root.month, root.year)
+                //     Button {
+                //         id: day
+                //         implicitWidth: 25
+                //         implicitHeight: 25
+                //         required property int index;
+                //         text: index + 1
+                //         Layout.row: Math.floor((root.startDay + index) / 7) + 1
+                //         Layout.column: (root.startDay + index) % 7
+                //         background: Rectangle {
+                //             color: (day.index + 1 === root.date &&
+                //                     root.month === parseInt(Time.format("M")) &&
+                //                     root.year === parseInt(Time.format("yyyy"))) ? "aqua" : 
+                //                     (calendar.selectedDate === day.index + 1) ? "yellow" :"white"
+                //         }
+                //         onClicked: {
+                //             calendar.selectedDate = index + 1;
+                //             Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
+                //                            calendar.selectedDate, root.month, root.year)
+                //         }
+                //     }
+                // }
             }
         }
         ColumnLayout {

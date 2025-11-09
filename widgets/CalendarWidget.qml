@@ -29,291 +29,185 @@ ColumnLayout {
         Tasks.refresh();
     }
     RowLayout {
-        ColumnLayout {
-            RowLayout {
-                Layout.fillWidth: true
-                Button {
-                    text: " "
-                    implicitWidth: 30
-                    onClicked: {
-                        if (root.month > 1) root.month -= 1;
-                        else {
-                            root.month = 12;
-                            root.year -= 1;
-                        }
-                    }
+        Layout.fillWidth: true
+        Layout.rightMargin: 30
+        Button {
+            text: ""
+            implicitWidth: 30
+            onClicked: {
+                if (root.month > 1) root.month -= 1;
+                else {
+                    root.month = 12;
+                    root.year -= 1;
                 }
-                Text {
-                    text: grid.title
-                    Layout.alignment: Qt.AlignHCenter
-                    Layout.fillWidth: true
-                    horizontalAlignment: Text.AlignHCenter
-                }
-                Button {
-                    text: " "
-                    implicitWidth: 30
-                    onClicked: {
-                        if (root.month < 12) root.month += 1;
-                        else {
-                            root.month = 1;
-                            root.year += 1;
-                        }
-                    }
-                }
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
-            GridLayout {
-                id: calendar
-                columns: 2
-                property int selectedDate: -1
-                DayOfWeekRow {
-                    Layout.column: 1
-                    Layout.fillWidth: true
-                    delegate: Text {
-                        required property string narrowName
-                        text: narrowName
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        color: "white"
-                        font {
-                            pointSize: 10
-                            family: "FiraCodeNerdFont"
-                        }
-                    }
+            background: Rectangle {
+                radius: 15
+            }
+        }
+        Text {
+            text: grid.title
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+            color: "white"
+            font {
+                family: "FiraCodeNerdFont"
+                pointSize: 10
+            }
+        }
+        Button {
+            text: ""
+            implicitWidth: 30
+            onClicked: {
+                if (root.month < 12) root.month += 1;
+                else {
+                    root.month = 1;
+                    root.year += 1;
                 }
-                WeekNumberColumn {
-                    month: root.month - 1
-                    year: root.year
-                    Layout.fillHeight: true
-                    delegate: Text {
-                        required property int weekNumber
-                        text: weekNumber
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        color: "white"
-                        font {
-                            pointSize: 10
-                            family: "FiraCodeNerdFont"
-                        }
-                    }
+            }
+            background: Rectangle {
+                radius: 15
+            }
+        }
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    }
+    GridLayout {
+        id: calendar
+        columns: 2
+        property int selectedDate: -1
+        DayOfWeekRow {
+            Layout.column: 1
+            Layout.fillWidth: true
+            Layout.rightMargin: 30
+            delegate: Text {
+                required property string narrowName
+                text: narrowName
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: "white"
+                font {
+                    pointSize: 10
+                    family: "FiraCodeNerdFont"
                 }
-                MonthGrid {
-                    id: grid
-                    month: root.month - 1
-                    year: root.year
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    delegate: Button {
-                        id: item
-                        required property var model
-                        implicitWidth: 25
-                        implicitHeight: 30
-                        text: grid.locale.toString(model.date, "d")
-                        opacity: model.month === grid.month ? 1: 0.1
-                        background: Rectangle {
-                            radius: 5
-                            color: (item.model.today) 
-                                        ? "#C44658" 
-                                        : (calendar.selectedDate === item.model.day && 
-                                           root.month - 1 === item.model.month)
-                                            ? "white" 
-                                            : "transparent"
-                            border.color: "white"
-                        }
-                        contentItem: Text {
-                            text: item.text
-                            color:(!item.model.today &&
-                                   calendar.selectedDate === item.model.day && 
+            }
+        }
+        WeekNumberColumn {
+            month: root.month - 1
+            year: root.year
+            Layout.fillHeight: true
+            delegate: Text {
+                required property int weekNumber
+                text: weekNumber
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                color: "white"
+                font {
+                    pointSize: 10
+                    family: "FiraCodeNerdFont"
+                }
+            }
+        }
+        MonthGrid {
+            id: grid
+            month: root.month - 1
+            year: root.year
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.rightMargin: 30
+            delegate: Button {
+                id: item
+                required property var model
+                implicitWidth: 25
+                implicitHeight: 30
+                text: grid.locale.toString(model.date, "d")
+                opacity: model.month === grid.month ? 1: 0.1
+                background: Rectangle {
+                    radius: 7
+                    color: (item.model.today) 
+                                ? "#C44658" 
+                                : (calendar.selectedDate === item.model.day && 
                                    root.month - 1 === item.model.month)
-                                        ? "#1E1E1E" 
-                                        : "white"
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                            font {
-                                pointSize: 10
-                                family: "FiraCodeNerdFont"
-                            }
-                        }
-                        onClicked: {
-                            console.log("TEST")
-                            calendar.selectedDate = model.day
-                        }
+                                    ? "white" 
+                                    : "transparent"
+                    border.color: "white"
+                }
+                contentItem: Text {
+                    text: item.text
+                    color:(!item.model.today &&
+                           calendar.selectedDate === item.model.day && 
+                           root.month - 1 === item.model.month)
+                                ? "#1E1E1E" 
+                                : "white"
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font {
+                        pointSize: 10
+                        family: "FiraCodeNerdFont"
                     }
                 }
-                // Repeater {
-                //     model: ["S", "M", "T", "W", "T", "F", "S"]
-                //     Text {
-                //         required property string modelData
-                //         text: {
-                //             return modelData;
-                //         }
-                //         Layout.alignment: Qt.AlignCenter
-                //     }
-                // }
-                // Repeater {
-                //     model: Utils.getMonthNumDays(root.month, root.year)
-                //     Button {
-                //         id: day
-                //         implicitWidth: 25
-                //         implicitHeight: 25
-                //         required property int index;
-                //         text: index + 1
-                //         Layout.row: Math.floor((root.startDay + index) / 7) + 1
-                //         Layout.column: (root.startDay + index) % 7
-                //         background: Rectangle {
-                //             color: (day.index + 1 === root.date &&
-                //                     root.month === parseInt(Time.format("M")) &&
-                //                     root.year === parseInt(Time.format("yyyy"))) ? "aqua" : 
-                //                     (calendar.selectedDate === day.index + 1) ? "yellow" :"white"
-                //         }
-                //         onClicked: {
-                //             calendar.selectedDate = index + 1;
-                //             Tasks.getTasks(calendar.selectedDate, root.month, root.year, 
-                //                            calendar.selectedDate, root.month, root.year)
-                //         }
-                //     }
-                // }
-            }
-        }
-        ColumnLayout {
-            Button {
-                text: "Create Task"
                 onClicked: {
-                    Tasks.createTask(
-                        newTitle.text, 
-                        newDesc.text, 
-                        hasDueCheck.checkState === Qt.Checked,
-                        datePicker.date,
-                        datePicker.month,
-                        datePicker.year
-                    );
-                    newTitle.text = "";
-                    newDesc.text = "";
-                    hasDueCheck.checkState === Qt.Unchecked
-                    datePicker.date = calendar.selectedDate;
-                    datePicker.date = root.month;
-                    datePicker.year = root.year;
-                }
-            }
-            RowLayout {
-                Text {
-                    text: "Due Date:"
-                }
-                CheckBox {
-                    id: hasDueCheck
-                    checkState: Qt.Unchecked
-                }
-            }
-            DatePickerWidget {
-                id: datePicker
-                visible: hasDueCheck.checkState === Qt.Checked
-                date: calendar.selectedDate
-                month: root.month
-                year: root.year
-            }
-            TextField {
-                id: newTitle
-                placeholderText: "Title"
-            }
-            TextField {
-                id: newDesc
-                placeholderText: "Description"
-            }
-        }
-    }
-
-    Text {
-        text: "No Due Date:"
-        visible: Tasks.noDueDate.length > 0
-    }
-    ScrollView {
-        implicitHeight: 50
-        ColumnLayout {
-            Repeater {
-                id: noDueTasklist
-                model: Tasks.noDueDate
-                RowLayout {
-                    id: task
-                    required property Tasks.Task modelData
-                    property bool editing: false;
-                    CheckBox {
-                        visible: !task.editing
-                        Layout.alignment: Qt.AlignTop
-                        id: checkbox
-                        enabled: !Tasks.toggling
-                        checkState: task.modelData.completed ? Qt.Checked : Qt.Unchecked
-                        onClicked: Tasks.toggleStatus(task.modelData.id)
-                    }
-                    DatePickerWidget {
-                        id: picker
-                        visible: task.editing
-                        date: task.modelData.day
-                        month: task.modelData.month
-                        year: task.modelData.year
-                    }
-                    ColumnLayout {
-                        Text {
-                            visible: !task.editing
-                            text: task.modelData.title
-                            Layout.preferredWidth: 200
-                            font.strikeout: checkbox.checkState === Qt.Checked
-                        }
-                        TextField {
-                            id: title
-                            visible: task.editing
-                            text: task.modelData.title
-                            // Keys.onReturnPressed: console.log("Enter")
-                        }
-                        Text {
-                            visible: !task.editing
-                            text: task.modelData.notes
-                            Layout.preferredWidth: 200
-                            font.strikeout: checkbox.checkState === Qt.Checked
-                            wrapMode: Text.Wrap
-                        }
-                        TextField {
-                            id: desc
-                            visible: task.editing
-                            text: task.modelData.notes
-                            // Keys.onReturnPressed: console.log("Enter")
-                        }
-                    }
-                    Button {
-                        text: (task.editing) ? "Save" : "Edit"
-                        implicitWidth: 40
-                        onClicked: {
-                            if (task.editing && 
-                                (title.text != task.modelData.title || 
-                                 desc.text  != task.modelData.notes)) {
-                                Tasks.setTitleAndDesc(task.modelData.id, title.text, desc.text);
-                            } else if (
-                                picker.date != task.modelData.day ||
-                                picker.month != task.modelData.month ||
-                                picker.year  != task.modelData.year) {
-                                Tasks.setDueDate(task.modelData.id, picker.date, picker.month, picker.year)
-                            }
-
-                            task.editing = !task.editing
-                        }
-                    }
-                    Button {
-                        text: "Delete"
-                        implicitWidth: 50
-                        onClicked: {
-                            task.visible = false;
-                            Tasks.deleteTask(task.modelData.id)
-                        }
-                    }
+                    calendar.selectedDate = model.day;
+                    root.month = model.month + 1;
+                    root.year = model.year;
                 }
             }
         }
+    }
+    Item {
+        implicitHeight: 30
+    }
+    Button {
+        text: "Create Task"
+        onClicked: {
+            Tasks.createTask(
+                newTitle.text, 
+                newDesc.text, 
+                hasDueCheck.checkState === Qt.Checked,
+                datePicker.date,
+                datePicker.month,
+                datePicker.year
+            );
+            newTitle.text = "";
+            newDesc.text = "";
+            hasDueCheck.checkState === Qt.Unchecked
+            datePicker.date = calendar.selectedDate;
+            datePicker.date = root.month;
+            datePicker.year = root.year;
+        }
+    }
+    RowLayout {
+        Text {
+            text: "Due Date:"
+        }
+        CheckBox {
+            id: hasDueCheck
+            checkState: Qt.Unchecked
+        }
+        DatePickerWidget {
+            id: datePicker
+            visible: hasDueCheck.checkState === Qt.Checked
+            date: root.date 
+            month: root.month 
+            year: root.year + 1 - currYear
+        }
+    }
+
+    TextField {
+        id: newTitle
+        placeholderText: "Title"
+    }
+    TextField {
+        id: newDesc
+        placeholderText: "Description"
     }
     Text {
         text: "Due soon:"
         visible: Tasks.incomplete.length > 0
     }
     ScrollView {
-        Layout.fillHeight: true
+        // Layout.fillHeight: true
+        implicitHeight: 100
         implicitWidth: 400
         ColumnLayout {
             Repeater {
@@ -394,6 +288,92 @@ ColumnLayout {
                         onClicked: {
                             task2.visible = false;
                             Tasks.deleteTask(task2.modelData.id)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Text {
+        text: "No Due Date:"
+        visible: Tasks.noDueDate.length > 0
+    }
+    ScrollView {
+        implicitHeight: 50
+        ColumnLayout {
+            Repeater {
+                id: noDueTasklist
+                model: Tasks.noDueDate
+                RowLayout {
+                    id: task
+                    required property Tasks.Task modelData
+                    property bool editing: false;
+                    CheckBox {
+                        visible: !task.editing
+                        Layout.alignment: Qt.AlignTop
+                        id: checkbox
+                        enabled: !Tasks.toggling
+                        checkState: task.modelData.completed ? Qt.Checked : Qt.Unchecked
+                        onClicked: Tasks.toggleStatus(task.modelData.id)
+                    }
+                    DatePickerWidget {
+                        id: picker
+                        visible: task.editing
+                        date: task.modelData.day
+                        month: task.modelData.month - 1
+                        year: task.modelData.year - 1
+                    }
+                    ColumnLayout {
+                        Text {
+                            visible: !task.editing
+                            text: task.modelData.title
+                            Layout.preferredWidth: 200
+                            font.strikeout: checkbox.checkState === Qt.Checked
+                        }
+                        TextField {
+                            id: title
+                            visible: task.editing
+                            text: task.modelData.title
+                            // Keys.onReturnPressed: console.log("Enter")
+                        }
+                        Text {
+                            visible: !task.editing
+                            text: task.modelData.notes
+                            Layout.preferredWidth: 200
+                            font.strikeout: checkbox.checkState === Qt.Checked
+                            wrapMode: Text.Wrap
+                        }
+                        TextField {
+                            id: desc
+                            visible: task.editing
+                            text: task.modelData.notes
+                            // Keys.onReturnPressed: console.log("Enter")
+                        }
+                    }
+                    Button {
+                        text: (task.editing) ? "Save" : "Edit"
+                        implicitWidth: 40
+                        onClicked: {
+                            if (task.editing && 
+                                (title.text != task.modelData.title || 
+                                 desc.text  != task.modelData.notes)) {
+                                Tasks.setTitleAndDesc(task.modelData.id, title.text, desc.text);
+                            } else if (
+                                picker.date != task.modelData.day ||
+                                picker.month != task.modelData.month ||
+                                picker.year  != task.modelData.year) {
+                                Tasks.setDueDate(task.modelData.id, picker.date, picker.month, picker.year)
+                            }
+
+                            task.editing = !task.editing
+                        }
+                    }
+                    Button {
+                        text: "Delete"
+                        implicitWidth: 50
+                        onClicked: {
+                            task.visible = false;
+                            Tasks.deleteTask(task.modelData.id)
                         }
                     }
                 }

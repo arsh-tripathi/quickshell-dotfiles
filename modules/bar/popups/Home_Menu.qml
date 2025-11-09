@@ -9,7 +9,7 @@ PopupMenu {
     id: home_popup
     required property var screen
     backgroundColor: "#1E1E1E"
-    implicitHeight: 500
+    implicitHeight: 800
     implicitWidth: 400
     onVisibleChanged: {
         calendar.refreshTasks()
@@ -98,6 +98,9 @@ PopupMenu {
                     }
                 }
             }
+        }
+        Item {
+            implicitHeight: 40
         }
         CalendarWidget {
             id: calendar

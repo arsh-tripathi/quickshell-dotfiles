@@ -9,6 +9,8 @@ Tumbler {
     implicitWidth: 60
     property color unhighlighted: "#C44658"
     property color highlighted: "white"
+    property int offset: 0
+    property bool hasNull: false
     delegate: Text {
         required property int index
         required property int modelData
@@ -22,6 +24,8 @@ Tumbler {
             family: "FiraCodeNerdFont"
         }
         function padWithZeros(num: int): string {
+            if (tumbler.hasNull && num == 0) return "--";
+            num += tumbler.offset;
             return (num < 10) ? "0" + num : num;
         }
     }

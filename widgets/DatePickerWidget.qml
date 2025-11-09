@@ -3,65 +3,58 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import qs.utils
+import qs.services
 
 RowLayout {
     id: root
     visible: false
-    property alias date: dateSpin.value
-    property alias month: monthSpin.value
-    property alias year: yearSpin.value
-    SpinBox {
+    property int currYear: parseInt(Time.format("yyyy"))
+    property alias date: dateSpin.currentIndex
+    property alias month: monthSpin.currentIndex
+    property alias year: yearSpin.currentIndex
+    onDateChanged: if (date == 0) reset();
+    onMonthChanged: if (month == 0) reset();
+    onYearChanged: if (year == 0) reset();
+    function reset() {
+        dateSpin.currentIndex = 0
+        monthSpin.currentIndex = 0
+        yearSpin.currentIndex = 0
+    }
+    StyledTumbler {
         id: dateSpin
-        editable: true
-        implicitWidth: 50
-        from: 1
-        to: Utils.getMonthNumDays(root.month, root.year)
-        value: 1
-
-        validator: IntValidator { bottom: 1; top: Utils.getMonthNumDays(root.month, root.year) }
-
-        textFromValue: function(value) {
-            return value.toString().padStart(2, "0")
+        hasNull: true
+        wrap: false
+        model: Utils.getMonthNumDays(root.month, root.year) + 1
+        visibleItemCount: 3
+        onCurrentIndexChanged: {
+            positionViewAtIndex(currentIndex, Tumbler.Center)
         }
-
-        valueFromText: function(text) {
-            return parseInt(text)
+        Component.onCompleted: {
+            positionViewAtIndex(currentIndex, Tumbler.Center)
         }
     }
-    SpinBox {
+    StyledTumbler {
         id: monthSpin
-        editable: true
-        from: 1
-        to: 12
-        value: 1
-        implicitWidth: 50
-
-        validator: IntValidator { bottom: 1; top: 12 }
-
-        textFromValue: function(value) {
-            return value.toString().padStart(2, "0")
+        hasNull: true
+        model: 13
+        wrap: false
+        visibleItemCount: 3
+        onCurrentIndexChanged: {
+            positionViewAtIndex(currentIndex, Tumbler.Center)
         }
-
-        valueFromText: function(text) {
-            return parseInt(text)
+        Component.onCompleted: {
+            positionViewAtIndex(currentIndex, Tumbler.Center)
         }
     }
-    SpinBox {
+    StyledTumbler {
         id: yearSpin
-        editable: true
-        from: 0
-        to: 2400
-        value: 2025
-        implicitWidth: 50
-
-        validator: IntValidator { bottom: 0; top: 2400 }
-
-        textFromValue: function(value) {
-            return value.toString().padStart(4, "0")
-        }
-
-        valueFromText: function(text) {
-            return parseInt(text)
+        offset: root.currYear - 1
+        hasNull: true
+        model: 100
+        wrap: false
+        visibleItemCount: 3
+        Component.onCompleted: {
+            positionViewAtIndex(currentIndex, Tumbler.Center)
         }
     }
 }
